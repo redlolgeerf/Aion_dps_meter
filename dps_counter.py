@@ -1,0 +1,162 @@
+#!/usr/bin/env python3.3
+from patterns import dpsPatterns
+from patterns import oddskills
+import re
+from datetime import datetime
+import os
+
+class damage_table():
+
+
+    def __init__(self):
+        super(damage_table, self).__init__()
+        self.file_path = "/home/eyeinthebrick/Python/dps/Chat.log"
+        self.my_oddskills = oddskills
+        #self.fill_table()
+
+
+    def initialize(self):
+        self.damage_dealt = {}
+        self.whose_dot = {}
+        self.crites = {}
+        self.timing = {}
+
+
+    def replace_summons(self, character):
+        """
+        replaces character, so elementals are not separate character
+        """
+        spirit_master = 'Вы'
+        healer = 'Вы'
+        if 'элементаль' in character:
+            return spirit_master
+        if 'Святая мощь' in character:
+            return healer
+        return character
+
+
+    def normalize(self, i_tuple):
+        """
+        just some hacks, so all variables are alike despite the pattern
+        """
+        date, crit, character, skill, damage, asd = i_tuple  # asd только для ловушек
+        if i_tuple[5]:  # пришлось ввести из-за ловушек
+            character = i_tuple[5]
+        try:
+            damage = int(damage.replace('\xa0', ''))
+        except:
+            damage = 0
+        character = self.replace_summons(character)
+        if crit is None:
+            crit = False
+        else:
+            crit = True
+        if not skill:
+            skill = 'Автоатака'
+        if not character:
+            character = 'Вы'
+        date = datetime.strptime(date[:-3], '%Y.%m.%d %H:%M:%S')
+        return date, crit, character, skill, damage
+
+
+    def is_new_dot(self, i, dotPattern):
+        """
+        put so, in case it would be reasonable to change
+        the mechanics of checking for dot
+        """
+        if (i + 2) <= len(self.dps):
+            if self.dps[i + 1].find(dotPattern) > -1:
+                return True
+        return False
+
+
+    def assign_dot_owner(self, character, skill):
+        """
+        remembers, who casted dot
+        structure is {skill:character}
+        """
+        self.whose_dot[skill] = character
+
+
+    def add_crit_to_crites(self, character, crit):
+        """
+        stores information on critical strikes
+        structure is {character:{strikes:0, crit:0}}
+        """
+        if character not in self.crites:
+            self.crites[character] = {'strikes': 0, 'crit': 0}
+        self.crites[character]['strikes'] += 1
+        if crit:
+            self.crites[character]['crit'] += 1
+
+
+    def add_damage_to_dealer(self, crit, character, skill, damage):
+        """
+        stores information on damage dealt
+        structure is {character:{skill:[damage_dealt, strikes]}}
+        """
+        if re.sub('\s[IV]+', '', skill) in self.my_oddskills or damage == 0:
+            return
+        if skill in self.whose_dot:
+            character = self.whose_dot[skill]
+        else:
+            self.add_crit_to_crites(character, crit)
+        if character not in self.damage_dealt:
+            self.damage_dealt[character] = {skill: [0, 0], 'total_damage': [0, 0]}
+        if skill not in self.damage_dealt[character]:
+            self.damage_dealt[character][skill] = [0, 0]
+        self.damage_dealt[character][skill][0] += damage
+        self.damage_dealt[character][skill][1] += 1
+        self.damage_dealt[character]['total_damage'][0] += damage
+        self.damage_dealt[character]['total_damage'][1] += 1
+
+
+    def add_timing(self, date, character):
+        """
+        stores information on start and end
+        structure is {character:{started:0, ended:0}}
+        """
+        if character not in self.timing:
+            self.timing[character] = {'started': date, 'ended': date}
+        else:
+            self.timing[character]['ended'] = date
+
+
+    def read_file(self):
+        self.dps = []
+        if not os.path.exists(self.file_path):
+            print('incorrect path')
+            return False
+        for encoding_ in ('utf-8', 'cp1251'):
+            try:
+                with open(self.file_path, 'r', encoding = encoding_) as f:
+                    for line in f:
+                        self.dps.append(line.rstrip())
+                return True
+            except:
+                pass
+        return False
+
+
+    def fill_table(self):
+        self.initialize()
+
+        i = 0
+        for i in range(0, len(self.dps)):
+            strike = self.dps[i]
+            for dpsPattern, check_dot, dotPattern in dpsPatterns:
+                dpsAmount = re.search(dpsPattern, strike, re.VERBOSE)
+                if dpsAmount:
+                    date, crit, character, skill, damage = self.normalize(dpsAmount.groups())
+                    if check_dot and self.is_new_dot(i, dotPattern):
+                        self.assign_dot_owner(character, skill)
+                    self.add_damage_to_dealer(crit, character, skill, damage)
+                    self.add_timing(date, character)
+                    break
+        return True
+
+my_damage_table = damage_table()
+
+if __name__=='__main__':
+    my_damage_table.read_file()
+    my_damage_table.fill_table()
