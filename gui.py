@@ -140,7 +140,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         '''fills combo with all characters'''
         self.combo.clear()
         if my_damage_table.damage_dealt:
-            for character_ in sorted(my_damage_table.damage_dealt.keys()):
+            for character_ in sorted(my_damage_table.damage_dealt.keys(), key=str.lower):
                 self.combo.addItem(character_)
 
     def openFile(self):
@@ -172,7 +172,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                 "Лог файл пуст", QtGui.QMessageBox.Ok)
                 return
 
-            character = sorted(my_damage_table.damage_dealt.keys())[0]
+            character = sorted(my_damage_table.damage_dealt.keys(), key=str.lower)[0]
             self.fillcombo()
             self.fillSkillsList(character)
             self.fillCharacterList()
