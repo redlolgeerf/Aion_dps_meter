@@ -5,22 +5,20 @@ import re
 from datetime import datetime
 import os
 
-class damage_table():
 
+class damage_table():  # lint:ok
 
-    def __init__(self):
+    def __init__(self):  # lint:ok
         super(damage_table, self).__init__()
         self.file_path = "/home/eyeinthebrick/Python/dps/logs/test.log"
         self.my_oddskills = oddskills
         #self.fill_table()
 
-
-    def initialize(self):
+    def initialize(self):  # lint:ok
         self.damage_dealt = {}
         self.whose_dot = {}
         self.crites = {}
         self.timing = {}
-
 
     def replace_summons(self, character):
         """
@@ -33,7 +31,6 @@ class damage_table():
         if 'Святая мощь' in character:
             return healer
         return character
-
 
     def normalize(self, i_tuple):
         """
@@ -58,7 +55,6 @@ class damage_table():
         date = datetime.strptime(date[:-3], '%Y.%m.%d %H:%M:%S')
         return date, crit, character, skill, damage
 
-
     def is_new_dot(self, i, dotPattern):
         """
         put so, in case it would be reasonable to change
@@ -69,14 +65,12 @@ class damage_table():
                 return True
         return False
 
-
     def assign_dot_owner(self, character, skill):
         """
         remembers, who casted dot
         structure is {skill:character}
         """
         self.whose_dot[skill] = character
-
 
     def add_crit_to_crites(self, character, crit):
         """
@@ -88,7 +82,6 @@ class damage_table():
         self.crites[character]['strikes'] += 1
         if crit:
             self.crites[character]['crit'] += 1
-
 
     def add_damage_to_dealer(self, crit, character, skill, damage):
         """
@@ -110,7 +103,6 @@ class damage_table():
         self.damage_dealt[character]['total_damage'][0] += damage
         self.damage_dealt[character]['total_damage'][1] += 1
 
-
     def add_timing(self, date, character):
         """
         stores information on start and end
@@ -121,7 +113,7 @@ class damage_table():
         else:
             self.timing[character]['ended'] = date
 
-    def read_file(self):
+    def read_file(self):  # lint:ok
         self.dps = []
         if not os.path.exists(self.file_path):
             print('incorrect path')
@@ -136,7 +128,7 @@ class damage_table():
                 pass
         return False
 
-    def fill_table(self):
+    def fill_table(self):  # lint:ok
         self.initialize()
 
         i = 0
@@ -153,6 +145,7 @@ class damage_table():
                     break
         return True
 
+
 def test1(table_for_test):  # lint:ok
     test_damage_dealt = {'Basota': {'total_damage': [2200, 2], 'Ожог V': [2200, 2]},
     'CrazyRussian': {'total_damage': [1988, 1], 'Автоатака': [1988, 1]}, 'Вы':
@@ -165,7 +158,7 @@ def test1(table_for_test):  # lint:ok
 
 my_damage_table = damage_table()
 
-if __name__=='__main__':
+if __name__ == '__main__':
     my_damage_table.read_file()
     my_damage_table.fill_table()
     total = 0
