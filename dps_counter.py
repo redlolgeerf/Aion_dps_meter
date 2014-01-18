@@ -10,7 +10,7 @@ class damage_table():
 
     def __init__(self):
         super(damage_table, self).__init__()
-        self.file_path = "/home/eyeinthebrick/Python/dps/Chat.log"
+        self.file_path = "/home/eyeinthebrick/Python/dps/logs/test.log"
         self.my_oddskills = oddskills
         #self.fill_table()
 
@@ -121,7 +121,6 @@ class damage_table():
         else:
             self.timing[character]['ended'] = date
 
-
     def read_file(self):
         self.dps = []
         if not os.path.exists(self.file_path):
@@ -129,14 +128,13 @@ class damage_table():
             return False
         for encoding_ in ('utf-8', 'cp1251'):
             try:
-                with open(self.file_path, 'r', encoding = encoding_) as f:
+                with open(self.file_path, 'r', encoding=encoding_) as f:
                     for line in f:
                         self.dps.append(line.rstrip())
                 return True
             except:
                 pass
         return False
-
 
     def fill_table(self):
         self.initialize()
@@ -155,8 +153,24 @@ class damage_table():
                     break
         return True
 
+def test1(table_for_test):  # lint:ok
+    test_damage_dealt = {'Basota': {'total_damage': [2200, 2], 'Ожог V': [2200, 2]},
+    'CrazyRussian': {'total_damage': [1988, 1], 'Автоатака': [1988, 1]}, 'Вы':
+     {'total_damage': [729, 1], 'Автоатака': [729, 1]}, 'PLAYGUN': {'total_damage': [3915, 1],
+     'Прицельный огонь IV': [3915, 1]}, 'Симпапушка': {'Жалящая стрела III': [2623, 1],
+     'total_damage': [2623, 1]}}
+    if table_for_test == test_damage_dealt:
+        return True
+    return False
+
 my_damage_table = damage_table()
 
 if __name__=='__main__':
     my_damage_table.read_file()
     my_damage_table.fill_table()
+    total = 0
+    for character in my_damage_table.damage_dealt:
+        total += my_damage_table.damage_dealt[character]['total_damage'][0]
+    print(test1(my_damage_table.damage_dealt))
+    print(my_damage_table.damage_dealt)
+    #print(total)
