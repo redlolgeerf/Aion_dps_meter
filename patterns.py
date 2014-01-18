@@ -2,7 +2,8 @@ oddskills = ('Усиление магического взрыва', 'Резки
 not_ctit = ('Применение смертельных ядов', 'Отравленный клинок', 'умение Стойка налетчика',
 'умение Готовность', 'Усмирение', 'Туманная завеса')
 
-blankPattern = r'()'
+blankgroupPattern = r'()'
+blankPattern = r''
 datePattern = r'^([\d.:\s]{22})'                  # дата и время вида '2013.12.15 19:55:14 : '
 critPattern = r'''(Критический \s удар\!)?\s?'''  # проверка на крит
 
@@ -15,34 +16,37 @@ chrskillusagePattern = r'''использует \:? \s'''
 chratackPattern = r'''наносит \s'''
 slfatackPattern = r'''нанесли \s'''
 
-skillnamePattern = r'''([\w\s]+ \s [IV]+) \.'''   # название скилла
+skillnamePattern = r'''([\w\s]+ \s [IV]+) \.'''   # название скилла с точкой на конце
+skillnamePattern2 = r'''([\w\s]+ \s [IV]+) \:'''  # название скилла с двоеточием на конце
 
 receiverPattern = r'''.+ получает \s'''
 damageamountPattern = r'''(\d+\s?\d*)\s?          # количество урона
                           ед\. \s урона'''        # ед. урона
-characterdotPattern = 'постоянно получает урон'
 
-dpsPatterns = (  # patter structure is (date)(crit)(character name)(skill)(damage_dealt)
+chrdotPattern = 'постоянно получает урон'
+slfdotPattern = 'получает продолжительный урон'
+
+dpsPatterns = (  # patter structure is (date)(crit)(character name)(skill)(damage_dealt)(trap)
     (
     # проверяет использование скилла другим персонажем
     # пример : 2014.01.11 23:22:53 : PLAYGUN использует:
     # Прицельный огонь IV. Разгневанный Сунаяка получает 3 915 ед. урона.
     datePattern + critPattern + chrnamePattern + chrskillusagePattern + skillnamePattern +
-    receiverPattern + damageamountPattern + blankPattern,
-    True, characterdotPattern
+    receiverPattern + damageamountPattern + blankgroupPattern,
+    True, chrdotPattern
     ),
     (
     # проверяет автоатаку другого персонажа
     # пример : 2014.01.11 23:22:53 : CrazyRussian наносит 1 988 ед. урона цели Разгневанный Сунаяка.
-    datePattern + critPattern + chrnamePattern + chratackPattern + blankPattern +
-    damageamountPattern + blankPattern,
+    datePattern + critPattern + chrnamePattern + chratackPattern + blankgroupPattern +
+    damageamountPattern + blankgroupPattern,
     False, ''
     ),
     (
     # проверяет на вашу автоатаку
     # пример : 2014.01.11 23:22:53 : Вы нанесли 729 ед. урона цели Разгневанный Сунаяка.
-    datePattern + critPattern + slfnamePattern + slfatackPattern + blankPattern +
-    damageamountPattern + blankPattern,
+    datePattern + critPattern + slfnamePattern + slfatackPattern + blankgroupPattern +
+    damageamountPattern + blankgroupPattern,
     False, ''
     ),
     (
@@ -51,9 +55,10 @@ dpsPatterns = (  # patter structure is (date)(crit)(character name)(skill)(damag
     # Разгневанный Сунаяка получает 376 ед. урона.
     # так же подходит к дотам
     # пример: 2014.01.11 23:22:58 : Ожог V: Разгневанный Сунаяка получает 1 155 ед. урона.
-    datePattern + critPattern + blankPattern + blankPattern + skillnamePattern +
-    receiverPattern + damageamountPattern + blankPattern,
-    True, 'получает продолжительный урон'),
+    datePattern + critPattern + blankgroupPattern + blankPattern + skillnamePattern2 +
+    receiverPattern + damageamountPattern + blankgroupPattern,
+    True, slfdotPattern
+    ),
     #(r'''                        #проверяет на элементаля/святую мощь
     #^([\d.:\s]{22})              #дата и время вида '2013.12.15 19:55:14 : '
     #(Критический \s удар\!)?\s?  #проверка на крит
@@ -65,7 +70,10 @@ dpsPatterns = (  # patter structure is (date)(crit)(character name)(skill)(damag
     #ед\. \s урона                #ед. урона
     #()
     #''', True, 'постоянно получает урон'),
-    (r'''                        #проверяет использование ловушки
+    (
+    # проверяет использование ловушки
+    # пример :
+    r'''
     ^([\d.:\s]{22})              #дата и время вида '2013.12.15 19:55:14 : '
     ()?\s?  #проверка на крит
     ()                           #имя персонажа = Вы
@@ -85,16 +93,16 @@ dpsPatterns = (  # patter structure is (date)(crit)(character name)(skill)(damag
     ()                           #количество урона
     ()
     ''', True, ''),
-    (r'''                        #проверяет использование сжечь чары другим персонажем
-    ^([\d.:\s]{22})              #дата и время вида '2013.12.15 19:55:14 : '
-    (Критический \s удар\!)?\s?  #проверка на крит
-    (\w+)\s                      #имя персонажа
-    использует \:? \s            #наносит/использует
-    ([\w\s]+ \s [IV]+) \.        #название скилла
-    .+ получает \s
-    (\d+\s?\d*)\s?               #количество урона
-    ед\. \s урона                #ед. урона
-    и лишается магического усиления
-    ()
-    ''', True, '')
+    #(r'''                        #проверяет использование сжечь чары другим персонажем
+    #^([\d.:\s]{22})              #дата и время вида '2013.12.15 19:55:14 : '
+    #(Критический \s удар\!)?\s?  #проверка на крит
+    #(\w+)\s                      #имя персонажа
+    #использует \:? \s            #наносит/использует
+    #([\w\s]+ \s [IV]+) \.        #название скилла
+    #.+ получает \s
+    #(\d+\s?\d*)\s?               #количество урона
+    #ед\. \s урона                #ед. урона
+    #и лишается магического усиления
+    #()
+    #''', True, '')
     )

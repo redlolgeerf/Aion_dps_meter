@@ -149,7 +149,8 @@ class damage_table():  # lint:ok
 def test1(table_for_test):  # lint:ok
     test_damage_dealt = {'Basota': {'total_damage': [2200, 2], 'Ожог V': [2200, 2]},
     'CrazyRussian': {'total_damage': [1988, 1], 'Автоатака': [1988, 1]}, 'Вы':
-     {'total_damage': [729, 1], 'Автоатака': [729, 1]}, 'PLAYGUN': {'total_damage': [3915, 1],
+     {'total_damage': [1105, 2], 'Автоатака': [729, 1], 'Ослабляющее клеймо I': [376, 1]},
+     'PLAYGUN': {'total_damage': [3915, 1],
      'Прицельный огонь IV': [3915, 1]}, 'Симпапушка': {'Жалящая стрела III': [2623, 1],
      'total_damage': [2623, 1]}}
     if table_for_test == test_damage_dealt:
