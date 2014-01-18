@@ -1,4 +1,4 @@
-#!/usr/bin/python
+ #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import sys
@@ -30,9 +30,6 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         self.tableWidget.setColumnWidth(0, 200)
         self.skillslist.setColumnWidth(0, 200)
         self.skillslist.setColumnWidth(0, 125)
-        #self.tableWidget.setColumnWidth(1, 50)
-        #self.tableWidget.setColumnWidth(2, 70)
-        #self.tableWidget.setColumnWidth(3, 100)
         self.tableWidget.horizontalHeader().setVisible(True)
         self.skillslist.horizontalHeader().setVisible(True)
 
