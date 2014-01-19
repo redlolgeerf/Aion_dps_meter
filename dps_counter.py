@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.3
-from patterns import dpsPatterns
+from patterns import rules
 from patterns import oddskills
 import re
 from datetime import datetime
@@ -92,8 +92,7 @@ class damage_table():  # lint:ok
             return
         if skill in self.whose_dot:
             character = self.whose_dot[skill]
-        else:
-            self.add_crit_to_crites(character, crit)
+        self.add_crit_to_crites(character, crit)
         if character not in self.damage_dealt:
             self.damage_dealt[character] = {skill: [0, 0], 'total_damage': [0, 0]}
         if skill not in self.damage_dealt[character]:
@@ -133,16 +132,24 @@ class damage_table():  # lint:ok
 
         i = 0
         for i in range(0, len(self.dps)):
-            strike = self.dps[i]
-            for dpsPattern, check_dot, dotPattern in dpsPatterns:
-                dpsAmount = re.search(dpsPattern, strike, re.VERBOSE)
-                if dpsAmount:
-                    date, crit, character, skill, damage = self.normalize(dpsAmount.groups())
-                    if check_dot and self.is_new_dot(i, dotPattern):
+            if i == 0:
+                prev_line = ''
+                this_line = self.dps[i]
+            if (i + 1) == len(self.dps):
+                next_line = ''
+            else:
+                next_line = self.dps[i + 1]
+            for find_rule, apply_rule in rules:
+                parsed_string = find_rule(this_line)
+                if parsed_string:
+                    date, crit, character, skill, damage, is_dot = \
+                    apply_rule(prev_line, parsed_string, next_line)
+                    if is_dot:
                         self.assign_dot_owner(character, skill)
                     self.add_damage_to_dealer(crit, character, skill, damage)
                     self.add_timing(date, character)
                     break
+            prev_line, this_line = this_line, next_line
         return True
 
 
@@ -152,7 +159,9 @@ def test1(table_for_test):  # lint:ok
      {'total_damage': [1105, 2], 'Автоатака': [729, 1], 'Ослабляющее клеймо I': [376, 1]},
      'PLAYGUN': {'total_damage': [3915, 1],
      'Прицельный огонь IV': [3915, 1]}, 'Симпапушка': {'Жалящая стрела III': [2623, 1],
-     'total_damage': [2623, 1]}}
+     'total_damage': [2623, 1]}, 'InvisiblEDeviL': {'Песчаная ловушка III': [64, 1],
+     'total_damage': [64, 1]},
+     'Арабэла': {'Клятва ветра I': [358, 1], 'total_damage': [358, 1]}}
     if table_for_test == test_damage_dealt:
         return True
     return False
