@@ -164,7 +164,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                 self.recalculate()
         else:
             print('threading!')
-
+            self.anal_button.setText('Считаю')
             self.threadPool = []
             self.threadPool.append(FillingThread())
             self.threadPool[len(self.threadPool) - 1].start()
@@ -178,6 +178,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
             while self.go:  # dirty hack, chage to something more safe
                 QtGui.QApplication.processEvents()
             self.progressBar.setRange(0, 1)
+            self.anal_button.setText('Посчитать')
             print('continueing!')
             if not my_damage_table.damage_dealt:
                 QtGui.QMessageBox.information(self, 'Лог файл пуст',
