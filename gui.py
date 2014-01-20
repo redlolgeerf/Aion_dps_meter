@@ -137,7 +137,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         '''fills combo with all characters'''
         self.combo.clear()
         if my_damage_table.damage_dealt:
-            for character_ in sorted(my_damage_table.damage_dealt.keys(), key=str.lower):
+            for character_ in sorted(list(my_damage_table.damage_dealt.keys()), key=str.lower):
                 self.combo.addItem(character_)
 
     def openFile(self):
@@ -163,7 +163,22 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                 self.openFile()
                 self.recalculate()
         else:
-            my_damage_table.fill_table()
+            print('threading!')
+
+            self.threadPool = []
+            self.threadPool.append(FillingThread())
+            self.threadPool[len(self.threadPool) - 1].start()
+
+            #thread = FillingThread()
+            #thread.trigger.connect(self.continue_recalculate)
+            #thread.start()
+
+            self.go = True
+            self.progressBar.setRange(0, 0)
+            while self.go:  # dirty hack, chage to something more safe
+                QtGui.QApplication.processEvents()
+            self.progressBar.setRange(0, 1)
+            print('continueing!')
             if not my_damage_table.damage_dealt:
                 QtGui.QMessageBox.information(self, 'Лог файл пуст',
                 "Лог файл пуст", QtGui.QMessageBox.Ok)
@@ -173,6 +188,24 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
             self.fillcombo()
             self.fillSkillsList(character)
             self.fillCharacterList()
+
+
+class FillingThread(QtCore.QThread):
+    'thead to calculate'
+    def __init__(self):  # lint:ok
+        QtCore.QThread.__init__(self)
+
+    def run(self):  # lint:ok
+        my_damage_table.fill_table()
+        print('done')
+        Dps_counter.go = False
+        #self.terminate()
+        print('destroyed')
+
+    def __del__(self):
+        '''implemented, so the tread is not destroyed by garbage collector,
+        while working'''
+        self.wait()
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
