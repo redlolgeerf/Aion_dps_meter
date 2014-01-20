@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'untitled.ui'
 #
-# Created: Tue Jan 14 00:16:19 2014
+# Created: Tue Jan 21 01:11:51 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -50,19 +50,12 @@ class Ui_MainWindow(object):
         self.formLayoutWidget.setGeometry(QtCore.QRect(530, 0, 361, 581))
         self.formLayoutWidget.setObjectName(_fromUtf8("formLayoutWidget"))
         self.formLayout = QtGui.QFormLayout(self.formLayoutWidget)
+        self.formLayout.setSizeConstraint(QtGui.QLayout.SetFixedSize)
         self.formLayout.setFieldGrowthPolicy(QtGui.QFormLayout.AllNonFixedFieldsGrow)
         self.formLayout.setMargin(0)
         self.formLayout.setObjectName(_fromUtf8("formLayout"))
-        spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.formLayout.setItem(1, QtGui.QFormLayout.FieldRole, spacerItem)
-        self.delButton = QtGui.QPushButton(self.formLayoutWidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.delButton.sizePolicy().hasHeightForWidth())
-        self.delButton.setSizePolicy(sizePolicy)
-        self.delButton.setObjectName(_fromUtf8("delButton"))
-        self.formLayout.setWidget(2, QtGui.QFormLayout.FieldRole, self.delButton)
+        spacerItem = QtGui.QSpacerItem(80, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.formLayout.setItem(0, QtGui.QFormLayout.LabelRole, spacerItem)
         self.anal_button = QtGui.QPushButton(self.formLayoutWidget)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -71,8 +64,29 @@ class Ui_MainWindow(object):
         self.anal_button.setSizePolicy(sizePolicy)
         self.anal_button.setObjectName(_fromUtf8("anal_button"))
         self.formLayout.setWidget(0, QtGui.QFormLayout.FieldRole, self.anal_button)
-        spacerItem1 = QtGui.QSpacerItem(80, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.formLayout.setItem(0, QtGui.QFormLayout.LabelRole, spacerItem1)
+        self.progressBar = QtGui.QProgressBar(self.formLayoutWidget)
+        self.progressBar.setEnabled(True)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.progressBar.sizePolicy().hasHeightForWidth())
+        self.progressBar.setSizePolicy(sizePolicy)
+        self.progressBar.setMinimum(0)
+        self.progressBar.setMaximum(1)
+        self.progressBar.setProperty("value", -1)
+        self.progressBar.setTextVisible(False)
+        self.progressBar.setObjectName(_fromUtf8("progressBar"))
+        self.formLayout.setWidget(1, QtGui.QFormLayout.FieldRole, self.progressBar)
+        spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.formLayout.setItem(2, QtGui.QFormLayout.FieldRole, spacerItem1)
+        self.delButton = QtGui.QPushButton(self.formLayoutWidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.delButton.sizePolicy().hasHeightForWidth())
+        self.delButton.setSizePolicy(sizePolicy)
+        self.delButton.setObjectName(_fromUtf8("delButton"))
+        self.formLayout.setWidget(3, QtGui.QFormLayout.FieldRole, self.delButton)
         self.tableWidget = QtGui.QTableWidget(self.tab_1)
         self.tableWidget.setGeometry(QtCore.QRect(0, 0, 531, 579))
         self.tableWidget.setStyleSheet(_fromUtf8(""))
@@ -169,8 +183,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
-        self.delButton.setText(_translate("MainWindow", "Очистить лог", None))
         self.anal_button.setText(_translate("MainWindow", "Посчитать", None))
+        self.delButton.setText(_translate("MainWindow", "Очистить лог", None))
         self.tableWidget.setSortingEnabled(True)
         item = self.tableWidget.verticalHeaderItem(0)
         item.setText(_translate("MainWindow", "1", None))
