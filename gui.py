@@ -83,6 +83,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         if my_damage_table.damage_dealt:
             i = 0
             skills = sorted(my_damage_table.damage_dealt[character])
+            self.skillslist.setRowCount(0)
             self.skillslist.setRowCount(len(skills))
             for skill in skills:
                 if skill != 'total_damage':
@@ -112,26 +113,41 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         if my_damage_table.damage_dealt:
             i = 0
             characters = sorted(my_damage_table.damage_dealt.keys())
+            self.tableWidget.setRowCount(1)
+            self.tableWidget.clearContents()
+            #self.tableWidget.setSortingEnabled(False)
             self.tableWidget.setRowCount(len(characters))
-            for character_ in characters:
-                damage = my_damage_table.damage_dealt[character_]['total_damage'][0]
-                time = int((my_damage_table.timing[character_]['ended'] -
-                my_damage_table.timing[character_]['started']).total_seconds())
-                if time:
-                    dps = int(damage / time)
-                else:
-                    dps = damage
-                crit = 0
-                if my_damage_table.crites.get(character_):
-                    if my_damage_table.crites.get(character_).get('crit'):
-                        crit = int(my_damage_table.crites[character_]['crit'] /
-                        my_damage_table.crites[character_]['strikes'] * 100)
-                for x, value in zip(list(range(4)), (character_, damage, dps, crit)):
-                    item = QtGui.QTableWidgetItem()
-                    item.setData(QtCore.Qt.DisplayRole, value)
-                    self.tableWidget.setItem(i, x, item)
-
+            #self.tableWidget.setSortingEnabled(True)
+            if my_damage_table.damage_dealt.get('Вы'):
+                self.fillCharacterrow('Вы', i)
                 i += 1
+            for character_ in characters:
+                if character_ != 'Вы':
+                    self.fillCharacterrow(character_, i)
+                    i += 1
+        return
+
+    def fillCharacterrow(self, character, i):
+        '''to allow tailore filling of the table'''
+        damage = my_damage_table.damage_dealt[character]['total_damage'][0]
+        times = int((my_damage_table.timing[character]['ended'] -
+        my_damage_table.timing[character]['started']).total_seconds())
+        if times:
+            dps = int(damage / times)
+        else:
+            dps = damage
+        crit = 0
+        if my_damage_table.crites.get(character):
+            if my_damage_table.crites.get(character).get('crit'):
+                crit = int(my_damage_table.crites[character]['crit'] /
+                my_damage_table.crites[character]['strikes'] * 100)
+        for x, value in zip(list(range(4)), (character, damage, dps, crit)):
+            item = QtGui.QTableWidgetItem()
+            item.setData(QtCore.Qt.DisplayRole, value)
+            if character == 'Вы':
+                item.setBackground(QtGui.QColor(255, 200, 35))
+            self.tableWidget.setItem(i, x, item)
+        return
 
     def fillcombo(self):
         '''fills combo with all characters'''
@@ -152,6 +168,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         '''just to be short'''
         with open(my_damage_table.file_path, 'w', encoding='cp1251') as f:
             f.write('')
+        self.tableWidget.setRowCount(0)
 
     def recalculate(self):
         '''recalculates all values in my_damage_table based on data from opened file'''
