@@ -1,4 +1,6 @@
 #!/usr/bin/env python3.3
+# -*- coding: utf-8 -*-
+
 from patterns import rules
 from patterns import oddskills
 import re
@@ -175,5 +177,5 @@ if __name__ == '__main__':
     for character in my_damage_table.damage_dealt:
         total += my_damage_table.damage_dealt[character]['total_damage'][0]
     print(test1(my_damage_table.damage_dealt))
-    print(my_damage_table.damage_dealt)
+    #print(my_damage_table.damage_dealt)
     #print(total)
