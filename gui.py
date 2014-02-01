@@ -7,6 +7,7 @@ import configparser
 import os
 from PyQt4 import QtCore
 from dps_counter import my_damage_table
+from dps_counter import test1
 import dps_gui
 
 
@@ -112,12 +113,13 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         '''just fills characterlist'''
         if my_damage_table.damage_dealt:
             i = 0
+            if not test1(my_damage_table.damage_dealt):
+                print("test1 failed")
+                print(my_damage_table.damage_dealt)
             characters = sorted(my_damage_table.damage_dealt.keys())
-            self.tableWidget.setRowCount(1)
-            self.tableWidget.clearContents()
-            #self.tableWidget.setSortingEnabled(False)
+            self.tableWidget.setSortingEnabled(False)
             self.tableWidget.setRowCount(len(characters))
-            #self.tableWidget.setSortingEnabled(True)
+            self.tableWidget.clearContents()
             if my_damage_table.damage_dealt.get('Вы'):
                 self.fillCharacterrow('Вы', i)
                 i += 1
@@ -125,6 +127,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                 if character_ != 'Вы':
                     self.fillCharacterrow(character_, i)
                     i += 1
+            self.tableWidget.setSortingEnabled(True)
         return
 
     def fillCharacterrow(self, character, i):
@@ -180,7 +183,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                 self.openFile()
                 self.recalculate()
         else:
-            print('threading!')
+            #print('threading!')
             self.anal_button.setText('Считаю')
             self.threadPool = []
             self.threadPool.append(FillingThread())
@@ -196,7 +199,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                 QtGui.QApplication.processEvents()
             self.progressBar.setRange(0, 1)
             self.anal_button.setText('Посчитать')
-            print('continueing!')
+            #print('continueing!')
             if not my_damage_table.damage_dealt:
                 QtGui.QMessageBox.information(self, 'Лог файл пуст',
                 "Лог файл пуст", QtGui.QMessageBox.Ok)
@@ -215,10 +218,10 @@ class FillingThread(QtCore.QThread):
 
     def run(self):  # lint:ok
         my_damage_table.fill_table()
-        print('done')
+        #print('done')
         Dps_counter.go = False
         #self.terminate()
-        print('destroyed')
+        #print('destroyed')
 
     def __del__(self):
         '''implemented, so the tread is not destroyed by garbage collector,
