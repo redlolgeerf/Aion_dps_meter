@@ -70,6 +70,26 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         self.open_file.triggered.connect(self.openFile)
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+D"), self, self.deleteFile)
         self.open_file.setShortcut('Ctrl+O')
+        self.tableWidget.customContextMenuRequested.connect(self.handleTableMenu)
+
+    def handleTableMenu(self, pos):
+        'context menu for charactertable'
+        self.menu = QtGui.QMenu(self)
+        showDetail = QtGui.QAction('Детали', self)
+        self.menu.addAction(showDetail)
+        index = self.tableWidget.indexAt(pos)
+        action = self.menu.exec_(QtGui.QCursor.pos())
+        if action == showDetail:
+            self.showDetail(index.row())
+        return
+
+    def showDetail(self, row):
+        'action for character table context menu, switches to detail tab'
+        characters = sorted(my_damage_table.damage_dealt.keys())
+        character = self.tableWidget.item(row, 0).text()
+        self.fillSkillsList(character)
+        self.combo.setCurrentIndex(characters.index(character))
+        self.tabWidget.setCurrentIndex(1)
 
     def main(self):  # lint:ok
         self.show()
@@ -92,7 +112,6 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                     strikes = my_damage_table.damage_dealt[character][skill][1]
                     for x in range(4):
                         item = QtGui.QTableWidgetItem()
-                        #self.skillslist.setItem(i, x, item)
                     for x, value in zip(list(range(4)), (skill,
                     damage, strikes, int(damage / strikes))):
                         item = QtGui.QTableWidgetItem()
@@ -218,10 +237,7 @@ class FillingThread(QtCore.QThread):
 
     def run(self):  # lint:ok
         my_damage_table.fill_table()
-        #print('done')
         Dps_counter.go = False
-        #self.terminate()
-        #print('destroyed')
 
     def __del__(self):
         '''implemented, so the tread is not destroyed by garbage collector,

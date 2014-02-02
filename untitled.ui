@@ -153,6 +153,9 @@
         <height>579</height>
        </rect>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
       <property name="styleSheet">
        <string notr="true"/>
       </property>

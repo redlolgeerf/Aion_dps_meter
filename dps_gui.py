@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'untitled.ui'
 #
-# Created: Tue Jan 21 01:11:51 2014
+# Created: Sun Feb  2 13:55:55 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -89,6 +89,7 @@ class Ui_MainWindow(object):
         self.formLayout.setWidget(3, QtGui.QFormLayout.FieldRole, self.delButton)
         self.tableWidget = QtGui.QTableWidget(self.tab_1)
         self.tableWidget.setGeometry(QtCore.QRect(0, 0, 531, 579))
+        self.tableWidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.tableWidget.setStyleSheet(_fromUtf8(""))
         self.tableWidget.setAlternatingRowColors(True)
         self.tableWidget.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
