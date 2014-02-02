@@ -29,8 +29,8 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         just some hacks to compensate qtdesigner
         """
         self.tableWidget.setColumnWidth(0, 200)
-        self.skillslist.setColumnWidth(0, 200)
-        self.skillslist.setColumnWidth(0, 125)
+        self.skillslist.setColumnWidth(0, 300)
+        self.skillslist.setColumnWidth(1, 125)
         self.tableWidget.horizontalHeader().setVisible(True)
         self.skillslist.horizontalHeader().setVisible(True)
 

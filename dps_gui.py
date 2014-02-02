@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'untitled.ui'
 #
-# Created: Sun Feb  2 17:25:46 2014
+# Created: Sun Feb  2 17:34:53 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -114,7 +114,7 @@ class Ui_MainWindow(object):
         self.tableWidget.setItem(0, 0, item)
         item = QtGui.QTableWidgetItem()
         self.tableWidget.setItem(0, 1, item)
-        self.tableWidget.horizontalHeader().setVisible(True)
+        self.tableWidget.horizontalHeader().setVisible(False)
         self.tableWidget.horizontalHeader().setHighlightSections(True)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.verticalHeader().setVisible(False)
@@ -157,14 +157,10 @@ class Ui_MainWindow(object):
         self.skillslist.verticalHeader().setVisible(False)
         self.skillslist.verticalHeader().setSortIndicatorShown(False)
         self.horizontalLayout_3.addWidget(self.skillslist)
-        spacerItem1 = QtGui.QSpacerItem(140, 20, QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem1)
         self.combo = QtGui.QComboBox(self.horizontalLayoutWidget_3)
         self.combo.setMinimumSize(QtCore.QSize(100, 0))
         self.combo.setObjectName(_fromUtf8("combo"))
         self.horizontalLayout_3.addWidget(self.combo)
-        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem2)
         self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
@@ -183,7 +179,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
