@@ -116,10 +116,12 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                 if skill != 'total_damage':
                     damage = my_damage_table.damage_dealt[character][skill][0]
                     strikes = my_damage_table.damage_dealt[character][skill][1]
+                    commit = damage / my_damage_table\
+                    .damage_dealt[character]['total_damage'][0] * 100
                     for x in range(4):
                         item = QtGui.QTableWidgetItem()
-                    for x, value in zip(list(range(4)), (skill,
-                    damage, strikes, int(damage / strikes))):
+                    for x, value in zip(list(range(5)), (skill,
+                    damage, strikes, int(damage / strikes), commit)):
                         item = QtGui.QTableWidgetItem()
                         item.setData(QtCore.Qt.DisplayRole, value)
                         self.skillslist.setItem(i, x, item)
@@ -129,10 +131,11 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
             damage = my_damage_table.damage_dealt[character]['total_damage'][0]
             strikes = my_damage_table.damage_dealt[character]['total_damage'][1]
 
-            for x, value in zip(list(range(4)), ('Всего', damage, strikes, int(damage / strikes))):
-                    item = QtGui.QTableWidgetItem()
-                    item.setData(QtCore.Qt.DisplayRole, value)
-                    self.skillslist.setItem(i, x, item)
+            for x, value in zip(list(range(5)), ('Всего', damage, strikes,
+            int(damage / strikes), 100)):
+                item = QtGui.QTableWidgetItem()
+                item.setData(QtCore.Qt.DisplayRole, value)
+                self.skillslist.setItem(i, x, item)
             self.skillslist.setSortingEnabled(True)
 
     def fillCharacterList(self):
@@ -159,6 +162,10 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
     def fillCharacterrow(self, character, i):
         '''to allow tailore filling of the table'''
         damage = my_damage_table.damage_dealt[character]['total_damage'][0]
+        total_all = 0
+        for character_ in my_damage_table.damage_dealt:
+            total_all += my_damage_table.damage_dealt[character_]['total_damage'][0]
+        commit = (damage / total_all * 100)
         times = int((my_damage_table.timing[character]['ended'] -
         my_damage_table.timing[character]['started']).total_seconds())
         if times:
@@ -170,13 +177,41 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
             if my_damage_table.crites.get(character).get('crit'):
                 crit = int(my_damage_table.crites[character]['crit'] /
                 my_damage_table.crites[character]['strikes'] * 100)
-        for x, value in zip(list(range(4)), (character, damage, dps, crit)):
+        for x, value in zip(list(range(6)), (character, damage, commit,
+        dps, crit, self.timeConvert(times))):
             item = QtGui.QTableWidgetItem()
             item.setData(QtCore.Qt.DisplayRole, value)
             if character == 'Вы':
                 item.setBackground(QtGui.QColor(255, 200, 35))
             self.tableWidget.setItem(i, x, item)
         return
+
+    def timeConvert(self, time, *args):
+        'takes time and converts it in words with right endings'
+        minutes = int(time / 60) if time > 0 else 0
+        seconds = time - 60 * minutes
+        if minutes % 20 == 1:
+            mending = 'а'
+        elif 1 < minutes % 20 < 5:
+            mending = 'ы'
+        else:
+            mending = ''
+        if minutes:
+            minutes = '%d минут%s' % (minutes, mending)
+        else:
+            minutes = ''
+        if seconds % 20 == 1:
+            sending = 'у'
+        elif 1 < seconds % 20 < 5:
+            sending = 'а'
+        else:
+            sending = ''
+        if seconds:
+            seconds = '%d секунд%s' % (seconds, sending)
+        else:
+            seconds = ''
+        return ('%s, %s' % (minutes, seconds) if (minutes and seconds)
+        else '%s%s' % (minutes, seconds))
 
     def fillcombo(self):
         '''fills combo with all characters'''
