@@ -68,8 +68,13 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         self.delButton.clicked[bool].connect(self.deleteFile)
         self.combo.activated[str].connect(self.onActivated)
         self.open_file.triggered.connect(self.openFile)
+        # hot keys
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+D"), self, self.deleteFile)
-        self.open_file.setShortcut('Ctrl+O')
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+В"), self, self.deleteFile)  # for Russian
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+O"), self, self.openFile)
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Щ"), self, self.openFile)  # for Russian
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+G"), self, self.recalculate)
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+П"), self, self.recalculate)  # for Russian
         self.tableWidget.customContextMenuRequested.connect(self.handleTableMenu)
 
     def handleTableMenu(self, pos):
@@ -196,6 +201,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
 
     def recalculate(self):
         '''recalculates all values in my_damage_table based on data from opened file'''
+        self.anal_button.setText('Считаю')
         if not my_damage_table.read_file():
             reply = QtGui.QMessageBox.question(self, 'Не найден лог файл',
             "Хотите выбрать лог файл?", QtGui.QMessageBox.Yes |
@@ -205,7 +211,6 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                 self.recalculate()
         else:
             #print('threading!')
-            self.anal_button.setText('Считаю')
             self.threadPool = []
             self.threadPool.append(FillingThread())
             self.threadPool[len(self.threadPool) - 1].start()
