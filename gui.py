@@ -78,9 +78,10 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         showDetail = QtGui.QAction('Детали', self)
         self.menu.addAction(showDetail)
         index = self.tableWidget.indexAt(pos)
-        action = self.menu.exec_(QtGui.QCursor.pos())
-        if action == showDetail:
-            self.showDetail(index.row())
+        if index.row() > -1:
+            action = self.menu.exec_(QtGui.QCursor.pos())
+            if action == showDetail:
+                self.showDetail(index.row())
         return
 
     def showDetail(self, row):
@@ -104,7 +105,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
         if my_damage_table.damage_dealt:
             i = 0
             skills = sorted(my_damage_table.damage_dealt[character])
-            self.skillslist.setRowCount(0)
+            self.skillslist.setSortingEnabled(False)
             self.skillslist.setRowCount(len(skills))
             for skill in skills:
                 if skill != 'total_damage':
@@ -127,6 +128,7 @@ class  Dps_counter(QtGui.QMainWindow, dps_gui.Ui_MainWindow):
                     item = QtGui.QTableWidgetItem()
                     item.setData(QtCore.Qt.DisplayRole, value)
                     self.skillslist.setItem(i, x, item)
+            self.skillslist.setSortingEnabled(True)
 
     def fillCharacterList(self):
         '''just fills characterlist'''
