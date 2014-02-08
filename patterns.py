@@ -27,6 +27,8 @@ receiverPattern = r'''.+ получает \s'''
 damageamountPattern = r'''(\d+\s?\d*)\s?          # количество урона
                           ед\. \s урона'''        # ед. урона
 
+targetPattern = r'''\s(.+)'''
+slftargetPattern = r'''\s цели \s (.+) \.'''         # парсим цель
 
 def normalize(date, crit, damage):
     """
@@ -53,19 +55,19 @@ def chr_skill(line):
     пример : 2014.01.11 23:22:53 : PLAYGUN использует:
     Прицельный огонь IV. Разгневанный Сунаяка получает 3 915 ед. урона.'''
     dpsPattern = pattern + chrnamePattern + chrskillusagePattern + \
-    skillnamePattern + receiverPattern + damageamountPattern
+    skillnamePattern + targetPattern + receiverPattern + damageamountPattern
     return re.search(dpsPattern, line, re.VERBOSE)
 
 
 def apply_chr_skill(prev_line, parsed_line, next_line):  # lint:ok
-    date, crit, character, skill, damage = parsed_line.groups()
+    date, crit, character, skill, target, damage = parsed_line.groups()
     chrdotPattern = 'постоянно получает урон'
     if next_line.find(chrdotPattern) > -1:
         is_dot = True
     else:
         is_dot = False
     date, crit, damage = normalize(date, crit, damage)
-    return date, crit, character, skill, damage, is_dot
+    return date, crit, character, skill, damage, is_dot, target
 
 
 def chr_atack(line):
@@ -73,46 +75,46 @@ def chr_atack(line):
     пример : 2014.01.11 23:22:53 : CrazyRussian наносит 1 988 ед. урона цели Разгневанный Сунаяка.
     '''
     chratackPattern = r'''наносит \s'''
-    dpsPattern = pattern + chrnamePattern + chratackPattern + damageamountPattern
+    dpsPattern = pattern + chrnamePattern + chratackPattern + damageamountPattern + slftargetPattern
     return re.search(dpsPattern, line, re.VERBOSE)
 
 
 def apply_chr_atack(prev_line, parsed_line, next_line):  # lint:ok
-    date, crit, character, damage = parsed_line.groups()
+    date, crit, character, damage, target = parsed_line.groups()
     skill = 'Автоатака'
     is_dot = False
     date, crit, damage = normalize(date, crit, damage)
-    return date, crit, character, skill, damage, is_dot
+    return date, crit, character, skill, damage, is_dot, target
 
 
 def slf_atack(line):
     '''проверяет на вашу автоатаку
     пример : 2014.01.11 23:22:53 : Вы нанесли 729 ед. урона цели Разгневанный Сунаяка.'''
     slfatackPattern = r'''нанесли \s'''
-    dpsPattern = pattern + slfnamePattern + slfatackPattern + damageamountPattern
+    dpsPattern = pattern + slfnamePattern + slfatackPattern + damageamountPattern + slftargetPattern
     return re.search(dpsPattern, line, re.VERBOSE)
 
 
 def apply_slf_atack(prev_line, parsed_line, next_line):  # lint:ok
-    date, crit, character, damage = parsed_line.groups()
+    date, crit, character, damage, target = parsed_line.groups()
     skill = 'Автоатака'
     is_dot = False
     date, crit, damage = normalize(date, crit, damage)
-    return date, crit, character, skill, damage, is_dot
+    return date, crit, character, skill, damage, is_dot, target
 
 
 def slf_skill(line):
-    '''проверяет использование скилла (персонаж=Вы)
+    """проверяет использование скилла (персонаж=Вы)
     пример : 2014.01.11 23:22:55 : Ослабляющее клеймо I:
     Разгневанный Сунаяка получает 376 ед. урона.
     так же подходит к дотам
-    пример: 2014.01.11 23:22:58 : Ожог V: Разгневанный Сунаяка получает 1 155 ед. урона.'''
-    dpsPattern = pattern + skillnamePattern2 + receiverPattern + damageamountPattern
+    пример: 2014.01.11 23:22:58 : Ожог V: Разгневанный Сунаяка получает 1 155 ед. урона."""
+    dpsPattern = pattern + skillnamePattern2 + targetPattern + receiverPattern + damageamountPattern
     return re.search(dpsPattern, line, re.VERBOSE)
 
 
 def apply_slf_skill(prev_line, parsed_line, next_line):  # lint:ok
-    date, crit, skill, damage = parsed_line.groups()
+    date, crit, skill, target, damage = parsed_line.groups()
     character = 'Вы'
     slfdotPattern = 'получает продолжительный урон'
     if next_line.find(slfdotPattern) > -1:
@@ -120,7 +122,7 @@ def apply_slf_skill(prev_line, parsed_line, next_line):  # lint:ok
     else:
         is_dot = False
     date, crit, damage = normalize(date, crit, damage)
-    return date, crit, character, skill, damage, is_dot
+    return date, crit, character, skill, damage, is_dot, target
 
 
 def trap(line):
@@ -139,8 +141,9 @@ def apply_trap(prev_line, parsed_line, next_line):  # lint:ok
     date, crit, skill, character = parsed_line.groups()
     damage = 0
     is_dot = True
+    target = 'All'
     date, crit, damage = normalize(date, crit, damage)
-    return date, crit, character, skill, damage, is_dot
+    return date, crit, character, skill, damage, is_dot, target
 
 
 def odd_skill(line):
@@ -154,8 +157,9 @@ def apply_odd_skill(prev_line, parsed_line, next_line):  # lint:ok
     date, crit, character, skill = parsed_line.groups()
     damage = 0
     is_dot = True
+    target = 'All'
     date, crit, damage = normalize(date, crit, damage)
-    return date, crit, character, skill, damage, is_dot
+    return date, crit, character, skill, damage, is_dot, target
 
 
 rules = (

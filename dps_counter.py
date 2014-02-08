@@ -8,10 +8,10 @@ from datetime import datetime
 import os
 
 
-class damage_table():  # lint:ok
+class DamageTable():  # lint:ok
 
     def __init__(self):  # lint:ok
-        super(damage_table, self).__init__()
+        super(DamageTable, self).__init__()
         self.file_path = "/home/eyeinthebrick/Python/dps/logs/test.log"
         self.my_oddskills = oddskills
         #self.fill_table()
@@ -67,12 +67,15 @@ class damage_table():  # lint:ok
                 return True
         return False
 
-    def assign_dot_owner(self, character, skill):
+    def assign_dot_owner(self, character, skill, target):
         """
         remembers, who casted dot
-        structure is {skill:character}
+        structure is {target : {skill:character}}
         """
-        self.whose_dot[skill] = character
+        if self.whose_dot.get(target):
+            self.whose_dot[target].update({skill: character})
+        else:
+            self.whose_dot[target] = {skill: character}
 
     def add_crit_to_crites(self, character, crit):
         """
@@ -85,15 +88,16 @@ class damage_table():  # lint:ok
         if crit:
             self.crites[character]['crit'] += 1
 
-    def add_damage_to_dealer(self, crit, character, skill, damage):
+    def add_damage_to_dealer(self, crit, character, skill, damage, target):
         """
         stores information on damage dealt
         structure is {character:{skill:[damage_dealt, strikes]}}
         """
         if re.sub('\s[IV]+', '', skill) in self.my_oddskills or damage == 0:
             return
-        if skill in self.whose_dot:
-            character = self.whose_dot[skill]
+        for x in ('All', target):
+            if self.whose_dot.get(x):
+                character = self.whose_dot.get(x).get(skill, character)
         self.add_crit_to_crites(character, crit)
         if character not in self.damage_dealt:
             self.damage_dealt[character] = {skill: [0, 0], 'total_damage': [0, 0]}
@@ -114,7 +118,7 @@ class damage_table():  # lint:ok
         else:
             self.timing[character]['ended'] = date
 
-    def read_file(self):  # lint:ok
+    def read_file(self):
         self.dps = []
         if not os.path.exists(self.file_path):
             print('incorrect path')
@@ -132,7 +136,6 @@ class damage_table():  # lint:ok
     def fill_table(self):  # lint:ok
         self.initialize()
 
-        i = 0
         for i in range(0, len(self.dps)):
             if i == 0:
                 prev_line = ''
@@ -144,11 +147,11 @@ class damage_table():  # lint:ok
             for find_rule, apply_rule in rules:
                 parsed_string = find_rule(this_line)
                 if parsed_string:
-                    date, crit, character, skill, damage, is_dot = \
+                    date, crit, character, skill, damage, is_dot, target = \
                     apply_rule(prev_line, parsed_string, next_line)
                     if is_dot:
-                        self.assign_dot_owner(character, skill)
-                    self.add_damage_to_dealer(crit, character, skill, damage)
+                        self.assign_dot_owner(character, skill, target)
+                    self.add_damage_to_dealer(crit, character, skill, damage, target)
                     self.add_timing(date, character)
                     break
             prev_line, this_line = this_line, next_line
@@ -168,7 +171,7 @@ def test1(table_for_test):  # lint:ok
         return True
     return False
 
-my_damage_table = damage_table()
+my_damage_table = DamageTable()
 
 if __name__ == '__main__':
     my_damage_table.read_file()
@@ -177,5 +180,6 @@ if __name__ == '__main__':
     for character in my_damage_table.damage_dealt:
         total += my_damage_table.damage_dealt[character]['total_damage'][0]
     print(test1(my_damage_table.damage_dealt))
-    #print(my_damage_table.damage_dealt)
+    print(my_damage_table.damage_dealt)
+    print(my_damage_table.whose_dot)
     #print(total)
